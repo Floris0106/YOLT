@@ -43,5 +43,6 @@
   "event.yolt.santa.coal_lore.2": "Did you forget to leave milk and cookies out for Santa?",
   "event.yolt.santa.check_chests": "You heard something rummaging through your items while you were sleeping. Maybe you should check to see whether everything is still there...",
   "enchantment.yolt.bountiful": "Bountiful",
-  "tag.item.yolt.enchantable.key": "Keys"
+  "tag.item.yolt.enchantable.key": "Keys",
+  "soundCategory.voice": "YOLT Custom Sounds"
 }
