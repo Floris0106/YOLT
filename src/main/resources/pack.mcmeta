@@ -1,0 +1,39 @@
+{
+  "pack": {
+    "description": "You Only Live Twice",
+    "min_format": 94,
+    "max_format": 94
+  },
+  "filter": {
+    "block": [
+      {
+        "namespace": "minecraft",
+        "path": "enchantment/binding_curse.json"
+      },
+      {
+        "namespace": "minecraft",
+        "path": "enchantment/mending.json"
+      },
+      {
+        "namespace": "minecraft",
+        "path": "enchantment/unbreaking.json"
+      },
+      {
+        "namespace": "minecraft",
+        "path": "enchantment/vanishing_curse.json"
+      },
+      {
+        "namespace": "minecraft",
+        "path": "structure/trial_chambers/reward/ominous_vault.nbt"
+      },
+      {
+        "namespace": "minecraft",
+        "path": "advancement/"
+      },
+      {
+        "namespace": "minecraft",
+        "path": "recipe/tnt.json"
+      }
+    ]
+  }
+}

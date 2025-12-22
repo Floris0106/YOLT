@@ -1,0 +1,7 @@
+{
+  "replace": true,
+  "values": [
+    "minecraft:fortune",
+    "minecraft:silk_touch"
+  ]
+}

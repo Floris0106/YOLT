@@ -1,0 +1,19 @@
+{
+	"event.yawn": {
+    "sounds": [
+      "yolt:yawn"
+    ]
+  },
+	"event.santa.sleigh_bells": {
+    "sounds": [
+      "yolt:sleigh_bells"
+    ]
+  },
+	"event.santa.ho_ho_ho": {
+    "sounds": [
+      "yolt:ho_ho_ho1",
+      "yolt:ho_ho_ho2",
+      "yolt:ho_ho_ho3"
+    ]
+  }
+}

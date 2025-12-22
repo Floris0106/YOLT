@@ -1,0 +1,98 @@
+{
+  "type": "minecraft:vault",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:enchanted_golden_apple",
+          "quality": -2,
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_potion",
+              "id": "minecraft:luck"
+            }
+          ],
+          "name": "minecraft:potion",
+          "quality": -3,
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "potion_contents": {
+                  "custom_effects": [
+                    {
+                      "id":"minecraft:levitation",
+                      "duration": 400
+                    }
+                  ]
+                }
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "minecraft:lingering_potion",
+          "quality": 2,
+          "weight": 2
+        },
+        {
+          "type": "minecraft:loot_table",
+          "quality": 1,
+          "value": "yolt:spawn_egg"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:dried_ghast",
+          "quality": -2,
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:creaking_heart"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:netherite_upgrade_smithing_template",
+          "quality": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:totem_of_undying",
+          "quality": 1
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "components": {
+                "stored_enchantments": {
+                  "yolt:bountiful": 1
+                },
+                "lore": [
+                  {
+                    "color": "dark_gray",
+                    "italic": false,
+                    "text": "The key to unlocking the most plentiful of treasures"
+                  }
+                ]
+              },
+              "function": "minecraft:set_components"
+            }
+          ],
+          "name": "minecraft:enchanted_book",
+          "weight": 3
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "yolt:present_unique"
+}

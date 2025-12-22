@@ -1,0 +1,22 @@
+{
+  "replace": true,
+  "values": [
+    "minecraft:bane_of_arthropods",
+    "minecraft:blast_protection",
+    "minecraft:breach",
+    "minecraft:density",
+    "minecraft:fire_protection",
+    "minecraft:impaling",
+    "minecraft:loyalty",
+    "minecraft:luck_of_the_sea",
+    "minecraft:lure",
+    "minecraft:piercing",
+    "minecraft:power",
+    "minecraft:projectile_protection",
+    "minecraft:protection",
+    "minecraft:quick_charge",
+    "minecraft:sharpness",
+    "minecraft:smite",
+    "minecraft:thorns"
+  ]
+}

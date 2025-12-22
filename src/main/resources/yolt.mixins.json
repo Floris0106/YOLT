@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "floris0106.yolt.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "AbsorptionMobEffectMixin",
+    "ArmorStandMixin",
+    "FallingBlockEntityMixin",
+    "FrostedIceBlockMixin",
+    "MobEffectsMixin",
+    "PlayerMixin",
+    "ServerLevelMixin",
+    "ServerPlayerMixin",
+    "VaultBlockEntity$ServerMixin",
+    "VaultState$1Mixin",
+    "VaultState$4Mixin",
+    "VaultStateMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}

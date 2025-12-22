@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "yolt",
+  "version": "${version}",
+  "name": "You Only Live Twice/Thrice",
+  "authors": ["Floris0106"],
+  "license": "All Rights Reserved",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "floris0106.yolt.Yolt"
+    ]
+  },
+  "mixins": [
+    "yolt.mixins.json"
+  ],
+  "accessWidener": "yolt.classtweaker",
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

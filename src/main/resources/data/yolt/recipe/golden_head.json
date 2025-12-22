@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "H": "minecraft:player_head"
+  },
+  "pattern": [
+    "GGG",
+    "GHG",
+    "GGG"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:enchanted_golden_apple",
+    "components": {
+      "minecraft:item_name": {"text": "Golden Head"}
+    }
+  }
+}
