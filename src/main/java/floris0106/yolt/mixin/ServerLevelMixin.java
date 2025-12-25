@@ -3,45 +3,35 @@ package floris0106.yolt.mixin;
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-
+import floris0106.yolt.config.Config;
+import floris0106.yolt.util.CutsceneHelper;
+import floris0106.yolt.util.Language;
+import floris0106.yolt.util.SoundHelper;
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.SleepStatus;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.component.ItemLore;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.VaultBlock;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
-import net.minecraft.world.level.block.entity.vault.VaultState;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.stream.Stream;
-
-import floris0106.yolt.config.Config;
-import floris0106.yolt.util.Language;
-import floris0106.yolt.util.SoundHelper;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin
@@ -54,7 +44,7 @@ public abstract class ServerLevelMixin
 	{
 		ServerLevel level = (ServerLevel) (Object) this;
 		players = level.getServer().getPlayerList().getPlayers();
-		if (!original.call(sleepStatus, 100, players))
+		if (yolt$sleepingCutsceneCounter == 0 && !original.call(sleepStatus, 100, players))
 			return false;
 
 		if (yolt$sleepingCutsceneCounter == 0)
@@ -147,6 +137,11 @@ public abstract class ServerLevelMixin
 			player.sendSystemMessage(Language.translatable("event.yolt.santa.check_chests").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
 		}
 
+		Map<ServerPlayer, BlockPos> sleepingPositions = new Reference2ReferenceOpenHashMap<>(players.size());
+		int y = level.getMaxY() + 1;
+		for (ServerPlayer player : players)
+			sleepingPositions.put(player, player.getSleepingPos().get().atY(y));
+
 		WorldBorder worldBorder = level.getWorldBorder();
 		int minDistance = Config.getMinimumPresentDistance();
 		int maxDistance = Config.getMaximumPresentDistance();
@@ -158,13 +153,13 @@ public abstract class ServerLevelMixin
 				if (x * x + z * z > maxDistance * maxDistance)
 					continue;
 
-				BlockPos pos = player.getSleepingPos().get().offset(x, 0, z);
+				BlockPos pos = sleepingPositions.get(player).offset(x, 0, z);
 				if (!worldBorder.isWithinBounds(pos))
 					continue;
 
 				boolean tooClose = false;
-				for (ServerPlayer other : players)
-					if (other.getSleepingPos().get().distSqr(pos) < minDistance * minDistance)
+				for (BlockPos other : sleepingPositions.values())
+					if (other.distSqr(pos) < minDistance * minDistance)
 					{
 						tooClose = true;
 						break;
@@ -172,31 +167,7 @@ public abstract class ServerLevelMixin
 				if (tooClose)
 					continue;
 
-				ArmorStand armorStand = new ArmorStand(level, pos.getX() + 0.5, level.getMaxY() + 2.0 + 8.0 * random.nextDouble(), pos.getZ() + 0.5);
-				armorStand.setSmall(true);
-				armorStand.setInvisible(true);
-				armorStand.addTag("yolt_remove_when_on_ground");
-				armorStand.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, -1));
-				Objects.requireNonNull(armorStand.getAttribute(Attributes.SCALE)).setBaseValue(0.0625);
-
-				FallingBlockEntity vault = new FallingBlockEntity(level, 0.0, 0.0, 0.0, Blocks.VAULT.defaultBlockState()
-					.setValue(VaultBlock.OMINOUS, true)
-					.setValue(VaultBlock.STATE, VaultState.ACTIVE)
-				);
-				vault.blockData = new CompoundTag();
-				CompoundTag config = new CompoundTag();
-				config.putString("loot_table", "yolt:present");
-				CompoundTag keyItem = new CompoundTag();
-				keyItem.putString("id", "minecraft:ominous_trial_key");
-				config.put("key_item", keyItem);
-				vault.blockData.put("config", config);
-				vault.time = Integer.MIN_VALUE;
-				vault.dropItem = false;
-
-				level.addFreshEntity(armorStand);
-				level.addFreshEntity(vault);
-				vault.startRiding(armorStand, true, false);
-
+				CutsceneHelper.spawnPresent(level, random, pos);
 				break;
 			}
 
