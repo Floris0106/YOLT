@@ -31,7 +31,6 @@ public class Config
     private int maximumPresentDistance = 128;
     private float minimumPresentHeight = 2;
     private float maximumPresentHeight = 16;
-    private int hotColdCooldown = 100;
 
     public static void load()
     {
@@ -219,16 +218,6 @@ public class Config
     public static void setMaximumPresentHeight(float maximumPresentHeight)
     {
         instance.maximumPresentHeight = maximumPresentHeight;
-        save();
-    }
-
-    public static int getHotColdCooldown()
-    {
-        return instance.hotColdCooldown;
-    }
-    public static void setHotColdCooldown(int hotColdCooldownTicks)
-    {
-        instance.hotColdCooldown = hotColdCooldownTicks;
         save();
     }
 }
