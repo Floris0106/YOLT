@@ -5,7 +5,7 @@
   "name": "You Only Live Twice/Thrice",
   "authors": ["Floris0106"],
   "license": "All Rights Reserved",
-  "environment": "server",
+  "environment": "*",
   "entrypoints": {
     "main": [
       "floris0106.yolt.Yolt"

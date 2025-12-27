@@ -63,7 +63,7 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 		for (ServerPlayer player : players)
 		{
 			BaseContainerBlockEntity[] nearbyContainers = BlockPos.betweenClosedStream(
-					AABB.unitCubeFromLowerCorner(Vec3.atLowerCornerOf(player.getSleepingPos().get()))
+					AABB.unitCubeFromLowerCorner(Vec3.atLowerCornerOf(BlockPos.containing(player.position())))
 						.inflate(Config.getContainerSearchRange())
 				)
 				.map(level::getBlockEntity)
@@ -141,7 +141,7 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 		Map<ServerPlayer, BlockPos> sleepingPositions = new Reference2ReferenceOpenHashMap<>(players.size());
 		int y = level.getMaxY() + 1;
 		for (ServerPlayer player : players)
-			sleepingPositions.put(player, player.getSleepingPos().get().atY(y));
+			sleepingPositions.put(player, BlockPos.containing(player.position()).atY(y));
 
 		WorldBorder worldBorder = level.getWorldBorder();
 		int minDistance = Config.getMinimumPresentDistance();
