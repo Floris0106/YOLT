@@ -1,24 +1,21 @@
 package floris0106.yolt.commands;
 
-import static net.minecraft.commands.Commands.literal;
-
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-
 import floris0106.yolt.config.Config;
+import floris0106.yolt.util.Language;
+import floris0106.yolt.util.ServerPlayerExtension;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 
-import floris0106.yolt.util.Language;
-import floris0106.yolt.util.ServerPlayerExtension;
-import net.minecraft.server.permissions.Permissions;
+import static net.minecraft.commands.Commands.*;
 
 public class ResetCommand
 {
 	public static ArgumentBuilder<CommandSourceStack, ?> register()
 	{
 		return literal("reset")
-            .requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
+            .requires(hasPermission(LEVEL_GAMEMASTERS))
 			.executes(ResetCommand::reset);
 	}
 

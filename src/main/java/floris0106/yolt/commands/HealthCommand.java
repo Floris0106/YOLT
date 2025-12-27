@@ -9,17 +9,15 @@ import floris0106.yolt.util.ServerPlayerExtension;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
+import static net.minecraft.commands.Commands.*;
 
 public class HealthCommand
 {
 	public static ArgumentBuilder<CommandSourceStack, ?> register()
 	{
 		return literal("health")
-            .requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
+            .requires(hasPermission(LEVEL_GAMEMASTERS))
 			.then(argument("player", EntityArgument.player())
 				.executes(HealthCommand::getTotalHealth)
 				.then(argument("health", DoubleArgumentType.doubleArg(-1.0))

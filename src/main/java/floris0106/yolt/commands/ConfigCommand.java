@@ -21,12 +21,10 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.Permissions;
 
 import java.util.function.*;
 
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
+import static net.minecraft.commands.Commands.*;
 
 public class ConfigCommand
 {
@@ -52,6 +50,7 @@ public class ConfigCommand
 	{
 		ArgumentBuilder<CommandSourceStack, ?> builder = literal("config")
 			.then(literal("reset")
+				.requires(hasPermission(LEVEL_GAMEMASTERS))
 				.executes(context -> {
 					Config.reset();
 					context.getSource().sendSuccess(() -> Language.translatable("commands.yolt.config.reset.success"), false);
@@ -87,7 +86,7 @@ public class ConfigCommand
 					return 1;
 				})
 				.then(argument(name, argument)
-					.requires(source -> source.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER))
+					.requires(hasPermission(LEVEL_GAMEMASTERS))
 					.executes(context ->
 					{
 						set(context);
