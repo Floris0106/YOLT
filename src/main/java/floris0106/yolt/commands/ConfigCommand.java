@@ -1,8 +1,5 @@
 package floris0106.yolt.commands;
 
-import static net.minecraft.commands.Commands.argument;
-import static net.minecraft.commands.Commands.literal;
-
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
@@ -11,7 +8,12 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-
+import floris0106.yolt.config.Config;
+import floris0106.yolt.util.FloatSupplier;
+import floris0106.yolt.util.Language;
+import floris0106.yolt.util.ServerPlayerExtension;
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+import it.unimi.dsi.fastutil.floats.FloatConsumer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.NbtTagArgument;
 import net.minecraft.nbt.FloatTag;
@@ -21,18 +23,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.IntConsumer;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
+import java.util.function.*;
 
-import floris0106.yolt.config.Config;
-import floris0106.yolt.util.FloatSupplier;
-import floris0106.yolt.util.Language;
-import floris0106.yolt.util.ServerPlayerExtension;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import it.unimi.dsi.fastutil.floats.FloatConsumer;
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
 
 public class ConfigCommand
 {
@@ -48,7 +42,9 @@ public class ConfigCommand
 			new IntegerOption("containerSearchRange", Config::getContainerSearchRange, Config::setContainerSearchRange),
 			new IntegerOption("averagePresentSpawnDistance", Config::getAveragePresentDistance, Config::setAveragePresentDistance),
 			new IntegerOption("minimumPresentSpawnDistance", Config::getMinimumPresentDistance, Config::setMinimumPresentDistance),
-			new IntegerOption("maximumPresentSpawnDistance", Config::getMaximumPresentDistance, Config::setMaximumPresentDistance)
+			new IntegerOption("maximumPresentSpawnDistance", Config::getMaximumPresentDistance, Config::setMaximumPresentDistance),
+			new FloatOption("minimumPresentSpawnHeight", Config::getMinimumPresentHeight, Config::setMinimumPresentHeight),
+			new FloatOption("maximumPresentSpawnHeight", Config::getMaximumPresentHeight, Config::setMaximumPresentHeight)
 		};
 
 	public static ArgumentBuilder<CommandSourceStack, ?> register()
@@ -211,6 +207,10 @@ public class ConfigCommand
 		public FloatOption(String name, float min, FloatSupplier getter, FloatConsumer setter)
 		{
 			this(name, min, Float.MAX_VALUE, getter, setter, false);
+		}
+		public FloatOption(String name, FloatSupplier getter, FloatConsumer setter)
+		{
+			this(name, -Float.MAX_VALUE, Float.MAX_VALUE, getter, setter, false);
 		}
 
         @Override

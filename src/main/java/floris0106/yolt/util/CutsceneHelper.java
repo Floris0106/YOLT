@@ -1,5 +1,6 @@
 package floris0106.yolt.util;
 
+import floris0106.yolt.config.Config;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -31,7 +32,12 @@ public class CutsceneHelper
         vault.time = Integer.MIN_VALUE;
         vault.dropItem = false;
 
-        ArmorStand armorStand = new ArmorStand(level, vault.getX(), vault.getY() + Mth.nextDouble(random, 0.0, 8.0), vault.getZ());
+        ArmorStand armorStand = new ArmorStand(
+            level,
+            vault.getX(),
+            vault.getY() + Mth.nextDouble(random, Config.getMinimumPresentHeight(), Config.getMaximumPresentHeight()),
+            vault.getZ()
+        );
         armorStand.setSmall(true);
         armorStand.setInvisible(true);
         armorStand.addTag("yolt_remove_when_on_ground");

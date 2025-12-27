@@ -2,7 +2,7 @@ package floris0106.yolt.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import floris0106.yolt.Yolt;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.RandomSource;
@@ -10,8 +10,6 @@ import net.minecraft.util.RandomSource;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-
-import floris0106.yolt.Yolt;
 
 public class Config
 {
@@ -31,6 +29,8 @@ public class Config
     private int averagePresentDistance = 64;
     private int minimumPresentDistance = 16;
     private int maximumPresentDistance = 128;
+    private float minimumPresentHeight = 2;
+    private float maximumPresentHeight = 16;
 
     public static void load()
     {
@@ -198,6 +198,26 @@ public class Config
     public static void setMaximumPresentDistance(int maximumPresentDistance)
     {
         instance.maximumPresentDistance = maximumPresentDistance;
+        save();
+    }
+
+    public static float getMinimumPresentHeight()
+    {
+        return instance.minimumPresentHeight;
+    }
+    public static void setMinimumPresentHeight(float minimumPresentHeight)
+    {
+        instance.minimumPresentHeight = minimumPresentHeight;
+        save();
+    }
+
+    public static float getMaximumPresentHeight()
+    {
+        return instance.maximumPresentHeight;
+    }
+    public static void setMaximumPresentHeight(float maximumPresentHeight)
+    {
+        instance.maximumPresentHeight = maximumPresentHeight;
         save();
     }
 }
