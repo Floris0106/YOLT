@@ -2,17 +2,16 @@ package floris0106.yolt.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-
+import floris0106.yolt.util.ServerLevelExtension;
+import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FallingBlockEntity.class)
 public class FallingBlockEntityMixin
@@ -26,11 +25,18 @@ public class FallingBlockEntityMixin
 		return original.call(state, context);
 	}
 
-	@Inject(method = "tick", at = @At(value = "INVOKE", ordinal = 2, target = "Lnet/minecraft/world/entity/item/FallingBlockEntity;discard()V"))
-	private void yolt$playLandingSound(CallbackInfo ci)
+	@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z"))
+	private boolean yolt$onPresentPlaced(Level level, BlockPos pos, BlockState state, int flags, Operation<Boolean> original)
 	{
-		FallingBlockEntity fallingBlock = (FallingBlockEntity) (Object) this;
-		if (fallingBlock.getBlockState().is(Blocks.VAULT))
-			fallingBlock.playSound(SoundEvents.ANVIL_LAND);
+		if (!original.call(level, pos, state, flags))
+			return false;
+
+		if (state.is(Blocks.VAULT))
+		{
+			((FallingBlockEntity) (Object) this).playSound(SoundEvents.ANVIL_LAND);
+			((ServerLevelExtension) level).yolt$addPresentPosition(pos);
+		}
+
+		return true;
 	}
 }

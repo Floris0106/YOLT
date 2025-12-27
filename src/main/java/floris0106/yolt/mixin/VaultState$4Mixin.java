@@ -3,6 +3,7 @@ package floris0106.yolt.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 
+import floris0106.yolt.util.ServerLevelExtension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -37,6 +38,8 @@ public abstract class VaultState$4Mixin
 
 			level.removeBlockEntity(pos);
 			level.removeBlock(pos, false);
+
+			((ServerLevelExtension) level).yolt$removePresentPosition(pos);
 
 			Vec3 particlePos = Vec3.atCenterOf(pos);
 			level.sendParticles(ParticleTypes.GUST, particlePos.x, particlePos.y, particlePos.z, 0, 0.0, 0.0, 0.0, 0.0);

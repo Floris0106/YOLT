@@ -4,9 +4,7 @@ import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import floris0106.yolt.config.Config;
-import floris0106.yolt.util.CutsceneHelper;
-import floris0106.yolt.util.Language;
-import floris0106.yolt.util.SoundHelper;
+import floris0106.yolt.util.*;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -15,10 +13,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.SleepStatus;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.gamerules.GameRules;
@@ -34,7 +35,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 @Mixin(ServerLevel.class)
-public abstract class ServerLevelMixin
+public abstract class ServerLevelMixin implements ServerLevelExtension
 {
 	@Unique
 	private int yolt$sleepingCutsceneCounter = 0;
@@ -174,5 +175,39 @@ public abstract class ServerLevelMixin
 		yolt$sleepingCutsceneCounter = 0;
 		level.getGameRules().set(GameRules.ADVANCE_TIME, true, level.getServer());
 		return true;
+	}
+
+	@Override
+	public void yolt$addPresentPosition(BlockPos pos)
+	{
+		PresentTracker tracker = ((ServerLevel) (Object) this).getDataStorage().computeIfAbsent(PresentTracker.DATA_TYPE);
+		tracker.getPositions().add(pos);
+		tracker.setDirty();
+	}
+
+	@Override
+	public void yolt$removePresentPosition(BlockPos pos)
+	{
+		PresentTracker tracker = ((ServerLevel) (Object) this).getDataStorage().computeIfAbsent(PresentTracker.DATA_TYPE);
+		tracker.getPositions().add(pos);
+		tracker.setDirty();
+	}
+
+	@Override
+	public double yolt$getPresentDistance(Vec3 pos)
+	{
+		ServerLevel level = (ServerLevel) (Object) this;
+		double distance = Double.MAX_VALUE;
+		for (Entity entity : level.getAllEntities())
+			if (entity instanceof FallingBlockEntity fallingBlock && fallingBlock.getBlockState().is(Blocks.VAULT))
+				distance = Math.min(distance, fallingBlock.position().distanceTo(pos));
+
+		return Math.min(distance, level.getDataStorage()
+			.computeIfAbsent(PresentTracker.DATA_TYPE)
+			.getPositions()
+			.stream()
+			.mapToDouble(blockPos -> Vec3.atCenterOf(blockPos).distanceTo(pos))
+			.min()
+			.orElse(Double.MAX_VALUE));
 	}
 }

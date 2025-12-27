@@ -44,7 +44,8 @@ public class ConfigCommand
 			new IntegerOption("minimumPresentSpawnDistance", Config::getMinimumPresentDistance, Config::setMinimumPresentDistance),
 			new IntegerOption("maximumPresentSpawnDistance", Config::getMaximumPresentDistance, Config::setMaximumPresentDistance),
 			new FloatOption("minimumPresentSpawnHeight", Config::getMinimumPresentHeight, Config::setMinimumPresentHeight),
-			new FloatOption("maximumPresentSpawnHeight", Config::getMaximumPresentHeight, Config::setMaximumPresentHeight)
+			new FloatOption("maximumPresentSpawnHeight", Config::getMaximumPresentHeight, Config::setMaximumPresentHeight),
+			new IntegerOption("presentHotColdCooldownTicks", 0, Config::getHotColdCooldown, Config::setHotColdCooldown),
 		};
 
 	public static ArgumentBuilder<CommandSourceStack, ?> register()
