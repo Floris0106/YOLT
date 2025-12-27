@@ -1,7 +1,7 @@
 package floris0106.yolt.util;
 
 import com.google.common.collect.ImmutableMap;
-
+import floris0106.yolt.Yolt;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-
-import floris0106.yolt.Yolt;
 
 public class Language
 {
@@ -34,11 +32,12 @@ public class Language
 		}
 	}
 
-	private static final Style LORE_STYLE = Style.EMPTY.withColor(ChatFormatting.DARK_GRAY).withItalic(false);
+	private static final Style LORE_STYLE = Style.EMPTY.withColor(ChatFormatting.GRAY).withItalic(true);
 	public static final List<Component> KEY_LORE = List.of(
 		Language.translatable("event.yolt.santa.key_lore.1").withStyle(LORE_STYLE),
 		Language.translatable("event.yolt.santa.key_lore.2").withStyle(LORE_STYLE),
-		Language.translatable("event.yolt.santa.key_lore.3").withStyle(LORE_STYLE)
+		Language.translatable("event.yolt.santa.key_lore.3").withStyle(LORE_STYLE),
+		Language.translatable("event.yolt.santa.key_lore.4").withStyle(LORE_STYLE).withStyle(ChatFormatting.DARK_GRAY)
 	);
 	public static final List<Component> COAL_LORE = List.of(
 		Language.translatable("event.yolt.santa.coal_lore.1").withStyle(LORE_STYLE),

@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,18 +44,19 @@ public class Events
 			!(player instanceof ServerPlayer serverPlayer))
 			return InteractionResult.PASS;
 
-		ServerLevelExtension extension = (ServerLevelExtension) level;
-		double distance = extension.yolt$getPresentDistance(player.position());
+		double distance = ((ServerLevelExtension) level).yolt$getPresentDistance(player.position());
+		Component component;
 		if (distance > 64.0)
-			serverPlayer.sendSystemMessage(Component.literal("Freezing cold").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD));
+			component = Component.literal("Freezing cold").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD);
 		else if (distance > 32.0)
-			serverPlayer.sendSystemMessage(Component.literal("Cold").withStyle(ChatFormatting.BLUE, ChatFormatting.BOLD));
+			component = Component.literal("Cold").withStyle(ChatFormatting.BLUE, ChatFormatting.BOLD);
 		else if (distance > 16.0)
-			serverPlayer.sendSystemMessage(Component.literal("Warm").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD));
+			component = Component.literal("Warm").withStyle(ChatFormatting.YELLOW, ChatFormatting.BOLD);
 		else if (distance > 8.0)
-			serverPlayer.sendSystemMessage(Component.literal("Hot").withStyle(ChatFormatting.RED, ChatFormatting.BOLD));
+			component = Component.literal("Hot").withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
 		else
-			serverPlayer.sendSystemMessage(Component.literal("Burning hot").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD));
+			component = Component.literal("Burning hot").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
+		serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(component));
 
 		return InteractionResult.SUCCESS;
 	}
