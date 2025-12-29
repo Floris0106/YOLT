@@ -44,7 +44,7 @@ public class Events
 			tickCounter = 0;
 		}
 
-		if (gameRules.get(GameRules.ADVANCE_TIME))
+		if (!gameRules.get(GameRules.ADVANCE_TIME))
 			return;
 
 		overworld.getGameRules().set(GameRules.ADVANCE_TIME, false, server);
