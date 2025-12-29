@@ -1,22 +1,25 @@
 package floris0106.yolt.util;
 
+import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import it.unimi.dsi.fastutil.objects.ObjectArraySet;
 
 public class PresentTracker extends SavedData
 {
     private static final String ID = "yolt_present_tracker";
-    private static final Codec<PresentTracker> CODEC = BlockPos.CODEC.listOf().xmap(PresentTracker::new, PresentTracker::getPositions);
+    private static final Codec<PresentTracker> CODEC = BlockPos.CODEC.listOf().xmap(PresentTracker::new, PresentTracker::getPositionList);
 
     @SuppressWarnings("DataFlowIssue")
     public static final SavedDataType<PresentTracker> DATA_TYPE = new SavedDataType<>(ID, PresentTracker::new, CODEC, null);
 
-    private final List<BlockPos> positions = new ArrayList<>();
+    private final Set<BlockPos> positions = new ObjectArraySet<>();
 
     private PresentTracker() {}
     private PresentTracker(List<BlockPos> positions)
@@ -24,8 +27,12 @@ public class PresentTracker extends SavedData
         this.positions.addAll(positions);
     }
 
-    public List<BlockPos> getPositions()
+    public Set<BlockPos> getPositions()
     {
         return positions;
+    }
+    private List<BlockPos> getPositionList()
+    {
+        return Lists.newArrayList(positions);
     }
 }
