@@ -45,7 +45,7 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 	{
 		ServerLevel level = (ServerLevel) (Object) this;
 		players = level.getServer().getPlayerList().getPlayers();
-		if (yolt$sleepingCutsceneCounter == 0 && !original.call(sleepStatus, 100, players))
+		if (yolt$sleepingCutsceneCounter == 0 && !original.call(sleepStatus, sleepingPercentage, players))
 			return false;
 
 		if (yolt$sleepingCutsceneCounter == 0)
@@ -58,14 +58,14 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 		if (yolt$sleepingCutsceneCounter <= 240)
 			return false;
 
+		players = players.stream().filter(ServerPlayer::isSleeping).toList();
+
 		RandomSource random = level.getRandom();
 		List<ServerPlayer> nicePlayers = Lists.newArrayList();
 		for (ServerPlayer player : players)
 		{
-			BaseContainerBlockEntity[] nearbyContainers = BlockPos.betweenClosedStream(
-					AABB.unitCubeFromLowerCorner(Vec3.atLowerCornerOf(BlockPos.containing(player.position())))
-						.inflate(Config.getContainerSearchRange())
-				)
+			BaseContainerBlockEntity[] nearbyContainers = BlockPos.betweenClosedStream(AABB.unitCubeFromLowerCorner(
+				Vec3.atLowerCornerOf(player.getSleepingPos().get())).inflate(Config.getContainerSearchRange()))
 				.map(level::getBlockEntity)
 				.flatMap(blockEntity -> blockEntity instanceof BaseContainerBlockEntity container ? Stream.of(container) : Stream.empty())
 				.toArray(BaseContainerBlockEntity[]::new);
@@ -141,7 +141,7 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 		Map<ServerPlayer, BlockPos> sleepingPositions = new Reference2ReferenceOpenHashMap<>(players.size());
 		int y = level.getMaxY() + 1;
 		for (ServerPlayer player : players)
-			sleepingPositions.put(player, BlockPos.containing(player.position()).atY(y));
+			sleepingPositions.put(player, player.getSleepingPos().get().atY(y));
 
 		WorldBorder worldBorder = level.getWorldBorder();
 		int minDistance = Config.getMinimumPresentDistance();
