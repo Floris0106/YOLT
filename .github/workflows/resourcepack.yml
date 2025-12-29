@@ -1,5 +1,6 @@
 name: Create server resource pack
 on: [workflow_dispatch]
+permissions: write-all
 jobs:
   zip:
     runs-on: ubuntu-latest
