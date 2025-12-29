@@ -5,9 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/upload-artifact@v6
+      - uses: dev-drprasad/delete-older-releases@v0.3.4
         with:
-          name: 'server-resource-pack'
-          path: |
-            src/main/resources/pack.mcmeta
-            src/main/resources/assets/**
+          keep_latest: 0
+      - run: |
+          cd src/main/resources
+          zip -r server-resource-pack.zip pack.mcmeta assets/
+          sha1sum server-resource-pack.zip > hash.txt
+      - uses: softprops/action-gh-release@v2.5.0
+        with:
+          body_path: src/main/resources/hash.txt
+          files: src/main/resources/server-resource-pack.zip
