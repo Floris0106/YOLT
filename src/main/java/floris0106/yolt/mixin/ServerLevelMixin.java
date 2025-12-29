@@ -174,6 +174,7 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 
 		yolt$sleepingCutsceneCounter = 0;
 		level.getGameRules().set(GameRules.ADVANCE_TIME, true, level.getServer());
+		level.getGameRules().set(GameRules.PLAYERS_SLEEPING_PERCENTAGE, 100, level.getServer());
 		return true;
 	}
 
