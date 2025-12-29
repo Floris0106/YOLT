@@ -16,5 +16,6 @@ jobs:
           sha1sum server-resource-pack.zip > hash.txt
       - uses: softprops/action-gh-release@v2.5.0
         with:
+          tag_name: server-resource-pack
           body_path: src/main/resources/hash.txt
           files: src/main/resources/server-resource-pack.zip
