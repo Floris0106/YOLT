@@ -29,6 +29,7 @@ public class YoltCommands
 					.then(ResetCommand.register())
 					.then(LivesCommand.register())
                     .then(HealthCommand.register())
+					.then(DebugCommand.register())
 					.then(ConfigCommand.register())
 			);
 		});

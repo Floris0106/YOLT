@@ -189,7 +189,7 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 	public void yolt$removePresentPosition(BlockPos pos)
 	{
 		PresentTracker tracker = ((ServerLevel) (Object) this).getDataStorage().computeIfAbsent(PresentTracker.DATA_TYPE);
-		tracker.getPositions().add(pos);
+		tracker.getPositions().remove(pos);
 		tracker.setDirty();
 	}
 
