@@ -17,8 +17,12 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gamerules.GameRules;
 
+import floris0106.yolt.config.Config;
+
 public class Events
 {
+	private static int tickCounter = 0;
+
 	public static void register()
 	{
 		ServerTickEvents.START_SERVER_TICK.register(Events::onStartServerTick);
@@ -28,8 +32,19 @@ public class Events
 	private static void onStartServerTick(MinecraftServer server)
 	{
 		ServerLevel overworld = server.overworld();
+		if (overworld.getDayTime() % 24000 != 18000)
+			return;
+
 		GameRules gameRules = overworld.getGameRules();
-		if (overworld.getDayTime() % 24000 != 18000 || !gameRules.get(GameRules.ADVANCE_TIME))
+
+		tickCounter++;
+		if (tickCounter > Config.getSleepPercentageDecrementTicks())
+		{
+			gameRules.set(GameRules.PLAYERS_SLEEPING_PERCENTAGE, Math.max(gameRules.get(GameRules.PLAYERS_SLEEPING_PERCENTAGE) - 1, 0), server);
+			tickCounter = 0;
+		}
+
+		if (gameRules.get(GameRules.ADVANCE_TIME))
 			return;
 
 		overworld.getGameRules().set(GameRules.ADVANCE_TIME, false, server);
