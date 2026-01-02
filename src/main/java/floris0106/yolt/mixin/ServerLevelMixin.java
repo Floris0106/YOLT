@@ -3,12 +3,12 @@ package floris0106.yolt.mixin;
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import floris0106.yolt.config.Config;
-import floris0106.yolt.util.*;
-import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.SleepStatus;
@@ -25,14 +25,27 @@ import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import floris0106.yolt.config.Config;
+import floris0106.yolt.util.CutsceneHelper;
+import floris0106.yolt.util.Events;
+import floris0106.yolt.util.Language;
+import floris0106.yolt.util.PresentTracker;
+import floris0106.yolt.util.Role;
+import floris0106.yolt.util.ServerLevelExtension;
+import floris0106.yolt.util.ServerPlayerExtension;
+import floris0106.yolt.util.SoundHelper;
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 
 @Mixin(ServerLevel.class)
 public abstract class ServerLevelMixin implements ServerLevelExtension
@@ -48,19 +61,61 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 		if (yolt$sleepingCutsceneCounter == 0 && !original.call(sleepStatus, sleepingPercentage, players))
 			return false;
 
+		RandomSource random = level.getRandom();
+		players = new ArrayList<>(players);
+		for (int i = 0; i < players.size(); i++)
+		{
+			int j = random.nextInt(i, players.size());
+			ServerPlayer temp = players.get(i);
+			players.set(i, players.get(j));
+			players.set(j, temp);
+		}
+
 		if (yolt$sleepingCutsceneCounter == 0)
 			SoundHelper.broadcast(level, SoundHelper.SLEIGH_BELLS, 1.0f, 1.0f);
 		else if (yolt$sleepingCutsceneCounter == 100)
 			SoundHelper.broadcast(level, SoundHelper.HO_HO_HO, 1.0f, 1.0f);
+		else if (yolt$sleepingCutsceneCounter == 200)
+		{
+			ServerPlayer victim = players.stream().filter(player -> ((ServerPlayerExtension) player).yolt$getLives() > 1).findAny().orElse(null);
+			ServerPlayer hunter = players.stream().filter(player -> player != victim && ((ServerPlayerExtension) player).yolt$getRole() == Role.NEUTRAL).findAny().orElse(null);
+			if (victim != null && hunter != null)
+			{
+				((ServerPlayerExtension) victim).yolt$setRole(Role.VICTIM);
+				((ServerPlayerExtension) hunter).yolt$setRole(Role.HUNTER);
+
+				hunter.connection.send(new ClientboundSetTitleTextPacket(Language.translatable("event.yolt.santa.grudge.1").withStyle(ChatFormatting.AQUA)));
+				hunter.connection.send(new ClientboundSetSubtitleTextPacket(Language.translatable("event.yolt.santa.grudge.2")));
+			}
+		}
+		else if (yolt$sleepingCutsceneCounter == 300)
+		{
+			ServerPlayer victim = null;
+			ServerPlayer hunter = null;
+			for (ServerPlayer player : players)
+				switch (((ServerPlayerExtension) player).yolt$getRole())
+				{
+					case VICTIM -> victim = player;
+					case HUNTER -> hunter = player;
+				}
+			if (victim != null && hunter != null)
+			{
+				hunter.sendSystemMessage(Language.translatable("event.yolt.santa.grudge.3", victim.getDisplayName()).withStyle(ChatFormatting.GRAY));
+				hunter.sendSystemMessage(Language.translatable("event.yolt.santa.grudge.4", Events.EXTRA_NAUGHTY_LIST).withStyle(ChatFormatting.GRAY));
+				hunter.sendSystemMessage(Language.translatable("event.yolt.santa.grudge.5").withStyle(ChatFormatting.GRAY));
+			}
+		}
 
 		yolt$sleepingCutsceneCounter++;
 
-		if (yolt$sleepingCutsceneCounter <= 240)
+		if (yolt$sleepingCutsceneCounter <= 300)
 			return false;
 
-		players = players.stream().filter(ServerPlayer::isSleeping).toList();
+		players = players.stream()
+			.filter(ServerPlayer::isSleeping)
+			.filter(player -> ((ServerPlayerExtension) player).yolt$getRole() != Role.VICTIM)
+			.toList();
 
-		RandomSource random = level.getRandom();
 		List<ServerPlayer> nicePlayers = Lists.newArrayList();
 		for (ServerPlayer player : players)
 		{
@@ -176,6 +231,12 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 		level.getGameRules().set(GameRules.ADVANCE_TIME, true, level.getServer());
 		level.getGameRules().set(GameRules.PLAYERS_SLEEPING_PERCENTAGE, 100, level.getServer());
 		return true;
+	}
+
+	@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V"))
+	private void yolt$wakeUpEarlier(ServerLevel level, long dayTime, Operation<Void> original)
+	{
+		original.call(level, (long) 23000);
 	}
 
 	@Override

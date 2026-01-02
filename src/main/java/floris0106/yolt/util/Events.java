@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,6 +22,8 @@ import floris0106.yolt.config.Config;
 
 public class Events
 {
+	public static Component EXTRA_NAUGHTY_LIST = Component.literal("EXTRA NAUGHTY LIST").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
+
 	private static int tickCounter = 0;
 
 	public static void register()
@@ -32,9 +35,45 @@ public class Events
 	private static void onStartServerTick(MinecraftServer server)
 	{
 		ServerLevel overworld = server.overworld();
-		if (overworld.getDayTime() % 24000 != 18000)
-			return;
+		switch ((int) overworld.getDayTime() % 24000)
+		{
+			case 13000 -> onNightfall(server);
+			case 18000 -> onMidnight(server, overworld);
+		}
+	}
 
+	private static void onNightfall(MinecraftServer server)
+	{
+		PlayerList playerList = server.getPlayerList();
+
+		ServerPlayer victim = null;
+		ServerPlayer hunter = null;
+		for (ServerPlayer player : playerList.getPlayers())
+		{
+			ServerPlayerExtension extension = ((ServerPlayerExtension) player);
+			switch (extension.yolt$getRole())
+			{
+				case VICTIM -> victim = player;
+				case HUNTER -> hunter = player;
+				case EXTRA_NAUGHTY ->
+				{
+					extension.yolt$setRole(Role.NEUTRAL);
+					playerList.broadcastSystemMessage(Language.translatable("event.yolt.forgiven", player.getDisplayName(), EXTRA_NAUGHTY_LIST), false);
+				}
+			}
+		}
+		if (victim != null && hunter != null)
+		{
+			((ServerPlayerExtension) victim).yolt$setRole(Role.NEUTRAL);
+			((ServerPlayerExtension) hunter).yolt$setRole(Role.EXTRA_NAUGHTY);
+
+			playerList.broadcastSystemMessage(Language.translatable("event.yolt.hunter_fail", hunter.getDisplayName(), EXTRA_NAUGHTY_LIST), false);
+			hunter.sendSystemMessage(Language.translatable("event.yolt.hunter_fail.clarification", EXTRA_NAUGHTY_LIST, victim.getDisplayName()).withStyle(ChatFormatting.GRAY));
+		}
+	}
+
+	private static void onMidnight(MinecraftServer server, ServerLevel overworld)
+	{
 		GameRules gameRules = overworld.getGameRules();
 
 		tickCounter++;
@@ -47,7 +86,7 @@ public class Events
 		if (!gameRules.get(GameRules.ADVANCE_TIME))
 			return;
 
-		overworld.getGameRules().set(GameRules.ADVANCE_TIME, false, server);
+		gameRules.set(GameRules.ADVANCE_TIME, false, server);
 		SoundHelper.broadcast(overworld, SoundHelper.YAWN, 1.0f, Mth.randomBetween(overworld.getRandom(), 0.9f, 1.1f));
 	}
 

@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.datafixers.util.Either;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -18,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import floris0106.yolt.config.Config;
 import floris0106.yolt.util.Language;
+import floris0106.yolt.util.Role;
 import floris0106.yolt.util.ServerPlayerExtension;
 
 @Mixin(Player.class)
@@ -27,7 +29,7 @@ public abstract class PlayerMixin
 	private MutableComponent yolt$overrideNameColor(Team team, Component component, Operation<MutableComponent> original)
 	{
 		if (this instanceof ServerPlayerExtension extension)
-			return component.copy().withStyle(Config.getColorByLives(extension.yolt$getLives()));
+			return component.copy().withStyle(extension.yolt$getRole() == Role.EXTRA_NAUGHTY ? ChatFormatting.GOLD : Config.getColorByLives(extension.yolt$getLives()));
 		return original.call(team, component);
 	}
 

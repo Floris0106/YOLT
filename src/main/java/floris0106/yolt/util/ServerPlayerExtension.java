@@ -7,4 +7,6 @@ public interface ServerPlayerExtension
     float yolt$getTotalHealth();
     void yolt$setTotalHealth(float total);
     void yolt$updateLives();
+	Role yolt$getRole();
+	void yolt$setRole(Role role);
 }

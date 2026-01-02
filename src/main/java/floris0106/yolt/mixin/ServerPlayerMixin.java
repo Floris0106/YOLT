@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Objects;
 
 import floris0106.yolt.config.Config;
+import floris0106.yolt.util.Role;
 import floris0106.yolt.util.ServerPlayerExtension;
 
 @Mixin(ServerPlayer.class)
@@ -38,6 +39,8 @@ public abstract class ServerPlayerMixin implements ServerPlayerExtension
 {
 	@Unique
 	private int yolt$lives;
+	@Unique
+	private Role yolt$role = Role.NEUTRAL;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	private void yolt$setInitialLives(MinecraftServer server, ServerLevel level, GameProfile profile, ClientInformation clientInformation, CallbackInfo ci)
@@ -50,7 +53,9 @@ public abstract class ServerPlayerMixin implements ServerPlayerExtension
 	@Inject(method = "restoreFrom", at = @At("TAIL"))
 	private void yolt$restoreLives(ServerPlayer oldPlayer, boolean alive, CallbackInfo ci)
 	{
-        yolt$lives = ((ServerPlayerExtension) oldPlayer).yolt$getLives();
+		ServerPlayerExtension extension = (ServerPlayerExtension) oldPlayer;
+        yolt$lives = extension.yolt$getLives();
+		yolt$role = extension.yolt$getRole();
 
         if (alive)
             return;
@@ -96,12 +101,14 @@ public abstract class ServerPlayerMixin implements ServerPlayerExtension
     private void yolt$readAdditionalSaveData(ValueInput valueInput, CallbackInfo ci)
     {
         yolt$lives = valueInput.getIntOr("YoltLives", Config.getDefaultLives());
+		yolt$role = Role.valueOf(valueInput.getStringOr("YoltRole", Role.NEUTRAL.toString()));
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     private void yolt$addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci)
     {
         valueOutput.putInt("YoltLives", yolt$lives);
+		valueOutput.putString("YoltRole", yolt$role.toString());
     }
 
 	@ModifyReturnValue(method = "getTabListDisplayName", at = @At("RETURN"))
@@ -161,4 +168,17 @@ public abstract class ServerPlayerMixin implements ServerPlayerExtension
         Objects.requireNonNull(player.getAttribute(Attributes.MAX_HEALTH)).setBaseValue(maxHealth);
         Objects.requireNonNull(player.getAttribute(Attributes.MAX_ABSORPTION)).setBaseValue(Config.getMaxTotalHealth() - maxHealth);
     }
+
+	@Override
+	public Role yolt$getRole()
+	{
+		return yolt$role;
+	}
+
+	@Override
+	public void yolt$setRole(Role role)
+	{
+		yolt$role = role;
+		yolt$updateNameColor();
+	}
 }

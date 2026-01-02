@@ -26,11 +26,13 @@ public class YoltCommands
 							), false);
 						return 1;
 					})
+					.then(RoleCommand.register())
 					.then(ResetCommand.register())
 					.then(LivesCommand.register())
                     .then(HealthCommand.register())
 					.then(DebugCommand.register())
 					.then(ConfigCommand.register())
+					.then(ClaimCommand.register())
 			);
 		});
 	}
