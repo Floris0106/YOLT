@@ -76,8 +76,7 @@ public class Events
 	{
 		GameRules gameRules = overworld.getGameRules();
 
-		tickCounter++;
-		if (tickCounter > Config.getSleepPercentageDecrementTicks())
+		if (overworld.players().stream().anyMatch(Player::isSleepingLongEnough) && ++tickCounter > Config.getSleepPercentageDecrementTicks())
 		{
 			gameRules.set(GameRules.PLAYERS_SLEEPING_PERCENTAGE, Math.max(gameRules.get(GameRules.PLAYERS_SLEEPING_PERCENTAGE) - 1, 0), server);
 			tickCounter = 0;
