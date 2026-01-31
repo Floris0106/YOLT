@@ -51,7 +51,12 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 public abstract class ServerLevelMixin implements ServerLevelExtension
 {
 	@Unique
+	private static final int YOLT$DAY_LENGTH_MULTIPLIER = 3;
+
+	@Unique
 	private int yolt$sleepingCutsceneCounter = 0;
+	@Unique
+	private int yolt$tickCounter = 0;
 
 	@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/players/SleepStatus;areEnoughDeepSleeping(ILjava/util/List;)Z"))
 	private boolean yolt$sleepingCutscene(SleepStatus sleepStatus, int sleepingPercentage, List<ServerPlayer> players, Operation<Boolean> original)
@@ -237,6 +242,17 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 	private void yolt$wakeUpEarlier(ServerLevel level, long dayTime, Operation<Void> original)
 	{
 		original.call(level, (long) 23000);
+	}
+
+	@WrapOperation(method = "tickTime", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;setDayTime(J)V"))
+	private void yolt$elongateDay(ServerLevel level, long time, Operation<Void> original)
+	{
+		if (++yolt$tickCounter < YOLT$DAY_LENGTH_MULTIPLIER)
+			return;
+
+		yolt$tickCounter = 0;
+		original.call(level, time);
+		Events.onTimeTick(level);
 	}
 
 	@Override

@@ -1,9 +1,9 @@
 package floris0106.yolt.util;
 
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -28,13 +28,12 @@ public class Events
 
 	public static void register()
 	{
-		ServerTickEvents.START_SERVER_TICK.register(Events::onStartServerTick);
 		UseItemCallback.EVENT.register(Events::onPlayerUseItem);
 	}
 
-	private static void onStartServerTick(MinecraftServer server)
+	public static void onTimeTick(ServerLevel overworld)
 	{
-		ServerLevel overworld = server.overworld();
+		MinecraftServer server = overworld.getServer();
 		switch ((int) overworld.getDayTime() % 24000)
 		{
 			case 13000 -> onNightfall(server);
@@ -76,7 +75,7 @@ public class Events
 	{
 		GameRules gameRules = overworld.getGameRules();
 
-		if (overworld.players().stream().anyMatch(Player::isSleepingLongEnough) && ++tickCounter > Config.getSleepPercentageDecrementTicks())
+		if (server.getPlayerList().getPlayers().stream().anyMatch(Player::isSleepingLongEnough) && ++tickCounter > Config.getSleepPercentageDecrementTicks())
 		{
 			gameRules.set(GameRules.PLAYERS_SLEEPING_PERCENTAGE, Math.max(gameRules.get(GameRules.PLAYERS_SLEEPING_PERCENTAGE) - 1, 0), server);
 			tickCounter = 0;
@@ -98,7 +97,7 @@ public class Events
 			return InteractionResult.PASS;
 
 		double distance = ((ServerLevelExtension) level).yolt$getPresentDistance(player.position());
-		Component component;
+		MutableComponent component;
 		if (distance > 64.0)
 			component = Component.literal("Freezing cold").withStyle(ChatFormatting.AQUA, ChatFormatting.BOLD);
 		else if (distance > 32.0)
@@ -109,7 +108,7 @@ public class Events
 			component = Component.literal("Hot").withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
 		else
 			component = Component.literal("Burning hot").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
-		serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(component));
+		serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(component.append(" (" + distance + " blocks)")));
 
 		return InteractionResult.SUCCESS;
 	}
