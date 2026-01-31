@@ -4,8 +4,12 @@ import static net.minecraft.commands.Commands.*;
 
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 
@@ -20,30 +24,41 @@ public class ClaimCommand
 	public static ArgumentBuilder<CommandSourceStack, ?> register()
 	{
 		return literal("claim")
-			.executes(ClaimCommand::claimKill);
+			.then(argument("player", EntityArgument.player())
+				.executes(ClaimCommand::claimKill));
 	}
 
-	private static int claimKill(CommandContext<CommandSourceStack> context)
-	{
-		ServerPlayer player = Objects.requireNonNull(context.getSource().getPlayer());
-		ServerPlayerExtension extension = (ServerPlayerExtension) player;
-		if (extension.yolt$getRole() != Role.HUNTER)
+	private static int claimKill(CommandContext<CommandSourceStack> context) throws CommandSyntaxException
+    {
+		ServerPlayer hunter = Objects.requireNonNull(context.getSource().getPlayer());
+		ServerPlayer victim = EntityArgument.getPlayer(context, "player");
+
+		ServerPlayerExtension hunterExtension = (ServerPlayerExtension) hunter;
+		ServerPlayerExtension victimExtension = (ServerPlayerExtension) victim;
+
+		PlayerList playerList = context.getSource().getServer().getPlayerList();
+		if (victimExtension.yolt$getRole() == Role.EXTRA_NAUGHTY)
 		{
-			context.getSource().sendFailure(Language.translatable("commands.yolt.claim.not_hunter"));
+			hunterExtension.yolt$setLives(hunterExtension.yolt$getLives() + 1);
+			victimExtension.yolt$setRole(Role.NEUTRAL);
+
+			playerList.broadcastSystemMessage(Language.translatable("commands.yolt.claim.extra_naughty.success", hunter.getDisplayName(), Component.literal("EXTRA NAUGHTY").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), victim.getDisplayName()), false);
+		}
+		else if (hunterExtension.yolt$getRole() != Role.HUNTER)
+		{
+			context.getSource().sendFailure(Language.translatable("commands.yolt.claim.victim.not_hunter"));
+			return 0;
+		}
+		else if (victimExtension.yolt$getRole() != Role.VICTIM)
+		{
+			context.getSource().sendFailure(Language.translatable("commands.yolt.claim.victim.not_victim", victim.getDisplayName()));
 			return 0;
 		}
 
-		PlayerList playerList = context.getSource().getServer().getPlayerList();
+		victimExtension.yolt$setRole(Role.NEUTRAL);
+		hunterExtension.yolt$setRole(Role.NEUTRAL);
 
-		ServerPlayer victim = null;
-		for (ServerPlayer other : playerList.getPlayers())
-			if (((ServerPlayerExtension) other).yolt$getRole() == Role.VICTIM)
-				victim = other;
-
-		((ServerPlayerExtension) Objects.requireNonNull(victim)).yolt$setRole(Role.NEUTRAL);
-		extension.yolt$setRole(Role.NEUTRAL);
-
-		playerList.broadcastSystemMessage(Language.translatable("commands.yolt.claim.success", player.getDisplayName(), Objects.requireNonNull(victim).getDisplayName()), false);
+		playerList.broadcastSystemMessage(Language.translatable("commands.yolt.claim.victim.success", hunter.getDisplayName(), victim.getDisplayName()), false);
 
 		return 1;
 	}
