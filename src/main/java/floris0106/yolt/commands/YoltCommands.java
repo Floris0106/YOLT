@@ -27,6 +27,7 @@ public class YoltCommands
 						return 1;
 					})
 					.then(RoleCommand.register())
+					.then(RevealCommand.register())
 					.then(ResetCommand.register())
 					.then(LivesCommand.register())
                     .then(HealthCommand.register())

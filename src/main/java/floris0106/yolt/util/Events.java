@@ -108,7 +108,7 @@ public class Events
 			component = Component.literal("Hot").withStyle(ChatFormatting.RED, ChatFormatting.BOLD);
 		else
 			component = Component.literal("Burning hot").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
-		serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(component.append(" (" + distance + " blocks)")));
+		serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(component.append(" (" + Math.round(distance) + " blocks)")));
 
 		return InteractionResult.SUCCESS;
 	}

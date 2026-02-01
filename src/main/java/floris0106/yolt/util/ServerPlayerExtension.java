@@ -9,4 +9,5 @@ public interface ServerPlayerExtension
     void yolt$updateLives();
 	Role yolt$getRole();
 	void yolt$setRole(Role role);
+	void yolt$revealTargets();
 }

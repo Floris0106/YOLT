@@ -3,14 +3,20 @@ package floris0106.yolt.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.authlib.GameProfile;
 
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LightningBolt;
@@ -21,6 +27,7 @@ import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -28,9 +35,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.List;
 import java.util.Objects;
 
 import floris0106.yolt.config.Config;
+import floris0106.yolt.util.Language;
 import floris0106.yolt.util.Role;
 import floris0106.yolt.util.ServerPlayerExtension;
 
@@ -180,5 +189,43 @@ public abstract class ServerPlayerMixin implements ServerPlayerExtension
 	{
 		yolt$role = role;
 		yolt$updateNameColor();
+	}
+
+	@Override
+	public void yolt$revealTargets()
+	{
+		ServerPlayer player = (ServerPlayer) (Object) this;
+		for (ServerPlayer other : player.level().getServer().getPlayerList().getPlayers())
+		{
+			ServerPlayerExtension extension = (ServerPlayerExtension) other;
+			if (extension.yolt$getRole() == Role.EXTRA_NAUGHTY || extension.yolt$getRole() == Role.VICTIM && yolt$role == Role.HUNTER)
+			{
+				if (other.level() == player.level())
+				{
+					player.connection.send(new ClientboundSetEntityDataPacket(other.getId(), List.of(SynchedEntityData.DataValue.create(Entity.DATA_SHARED_FLAGS_ID, (byte) (other.getEntityData().get(Entity.DATA_SHARED_FLAGS_ID) | 1 << 6)))));
+
+					Vec3 distance = other.position().subtract(player.position()).with(Direction.Axis.Y, 0.0);
+					String direction;
+					switch (Mth.floor(distance.rotation().y / 22.5))
+					{
+						case 7, -8 -> direction = "north";
+						case -7, -6 -> direction = "northeast";
+						case -5, -4 -> direction = "east";
+						case -3, -2 -> direction = "southeast";
+						case -1, 0 -> direction = "south";
+						case 1, 2 -> direction = "southwest";
+						case 3, 4 -> direction = "west";
+						case 5, 6 -> direction = "northwest";
+						default -> throw new IndexOutOfBoundsException();
+                    }
+
+					player.sendSystemMessage(Language.translatable("event.yolt.reveal", other.getDisplayName(), Math.round(distance.length()), direction));
+				}
+				else
+					player.sendSystemMessage(Language.translatable("event.yolt.reveal.other_dimension", other.getDisplayName()));
+			}
+			else if (other.level() == player.level())
+				player.connection.send(new ClientboundSetEntityDataPacket(other.getId(), List.of(SynchedEntityData.DataValue.create(Entity.DATA_SHARED_FLAGS_ID, (byte) (other.getEntityData().get(Entity.DATA_SHARED_FLAGS_ID) & ~(1 << 6))))));
+		}
 	}
 }

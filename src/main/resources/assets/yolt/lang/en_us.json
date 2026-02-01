@@ -46,6 +46,7 @@
   "commands.yolt.claim.extra_naughty.success": "%s has killed the %s player %s, and has been rewarded with an extra life.",
   "commands.yolt.role.query": "%s's role is %s",
   "commands.yolt.role.set": "%s's role has been set to %s",
+  "commands.yolt.reveal.success": "Any potential targets have been revealed",
   "block.minecraft.bed.not_tired": "You may not rest now; you are not tired enough yet",
   "item.yolt.candy_key": "Candy Key",
   "event.yolt.santa.key_lore.1": "Looks delicious, but is unfortunately inedible",
@@ -63,6 +64,8 @@
   "event.yolt.hunter_fail": "%s has failed in doing Santa's bidding! They have been put on the %s, and whoever kills them will be rewarded with an extra life! (which can be claimed with the command /yolt claim [player])",
   "event.yolt.hunter_fail.clarification": "Now that you are on the %s, your only goal is to survive. You are no longer allowed to attack %s.",
   "event.yolt.forgiven": "%s has been forgiven, and is no longer on the %s. Greens and yellows are no longer allowed to attack them.",
+  "event.yolt.reveal": "%s is %s blocks to the %s",
+  "event.yolt.reveal.other_dimension": "%s is in another dimension",
   "enchantment.yolt.bountiful": "Bountiful",
   "tag.item.yolt.enchantable.key": "Keys",
   "soundCategory.voice": "YOLT Custom Sounds"
