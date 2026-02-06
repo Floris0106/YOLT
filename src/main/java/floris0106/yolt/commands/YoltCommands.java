@@ -31,6 +31,7 @@ public class YoltCommands
 					.then(ResetCommand.register())
 					.then(LivesCommand.register())
                     .then(HealthCommand.register())
+					.then(GiftCommand.register())
 					.then(DebugCommand.register())
 					.then(DeathmatchCommand.register())
 					.then(ConfigCommand.register())
