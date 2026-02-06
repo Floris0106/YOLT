@@ -5,6 +5,7 @@ import com.mojang.brigadier.context.CommandContext;
 import floris0106.yolt.config.Config;
 import floris0106.yolt.util.CutsceneHelper;
 import floris0106.yolt.util.Language;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -33,6 +34,7 @@ public class GiftCommand
         ServerLevel level = context.getSource().getLevel();
         WorldBorder worldBorder = level.getWorldBorder();
         int maxDistance = Config.getMaximumPresentDistance();
+        int maxY = level.getMaxY();
         level.players().stream().filter(player -> player.gameMode() != GameType.SPECTATOR).forEach(player ->
         {
             for (int i = 0; i < 100; i++)
@@ -42,9 +44,11 @@ public class GiftCommand
                 if (x * x + z * z > maxDistance * maxDistance)
                     continue;
 
-                BlockPos pos = player.getOnPos().offset(x, 0, z);
+                BlockPos pos = player.getOnPos().offset(x, 0, z).atY(maxY);
                 if (!worldBorder.isWithinBounds(pos))
                     continue;
+
+                player.sendSystemMessage(Language.translatable("event.yolt.gift").withStyle(ChatFormatting.GRAY));
 
                 ItemStack key = new ItemStack(Items.OMINOUS_TRIAL_KEY);
                 key.set(DataComponents.ITEM_NAME, Language.translatable("item.yolt.candy_key"));
