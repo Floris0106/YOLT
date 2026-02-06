@@ -7,8 +7,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
-import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.SleepStatus;
@@ -80,36 +78,6 @@ public abstract class ServerLevelMixin implements ServerLevelExtension
 			SoundHelper.broadcast(level, SoundHelper.SLEIGH_BELLS, 1.0f, 1.0f);
 		else if (yolt$sleepingCutsceneCounter == 100)
 			SoundHelper.broadcast(level, SoundHelper.HO_HO_HO, 1.0f, 1.0f);
-		else if (yolt$sleepingCutsceneCounter == 200)
-		{
-			ServerPlayer victim = players.stream().filter(player -> ((ServerPlayerExtension) player).yolt$getLives() > 1).findAny().orElse(null);
-			ServerPlayer hunter = players.stream().filter(player -> player != victim && ((ServerPlayerExtension) player).yolt$getRole() == Role.NEUTRAL).findAny().orElse(null);
-			if (victim != null && hunter != null)
-			{
-				((ServerPlayerExtension) victim).yolt$setRole(Role.VICTIM);
-				((ServerPlayerExtension) hunter).yolt$setRole(Role.HUNTER);
-
-				hunter.connection.send(new ClientboundSetTitleTextPacket(Language.translatable("event.yolt.santa.grudge.1").withStyle(ChatFormatting.AQUA)));
-				hunter.connection.send(new ClientboundSetSubtitleTextPacket(Language.translatable("event.yolt.santa.grudge.2")));
-			}
-		}
-		else if (yolt$sleepingCutsceneCounter == 300)
-		{
-			ServerPlayer victim = null;
-			ServerPlayer hunter = null;
-			for (ServerPlayer player : players)
-				switch (((ServerPlayerExtension) player).yolt$getRole())
-				{
-					case VICTIM -> victim = player;
-					case HUNTER -> hunter = player;
-				}
-			if (victim != null && hunter != null)
-			{
-				hunter.sendSystemMessage(Language.translatable("event.yolt.santa.grudge.3", victim.getDisplayName()).withStyle(ChatFormatting.GRAY));
-				hunter.sendSystemMessage(Language.translatable("event.yolt.santa.grudge.4", Events.EXTRA_NAUGHTY_LIST).withStyle(ChatFormatting.GRAY));
-				hunter.sendSystemMessage(Language.translatable("event.yolt.santa.grudge.5").withStyle(ChatFormatting.GRAY));
-			}
-		}
 
 		yolt$sleepingCutsceneCounter++;
 

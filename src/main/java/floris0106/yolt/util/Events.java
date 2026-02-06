@@ -7,6 +7,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,11 +20,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.gamerules.GameRules;
-
-import floris0106.yolt.config.Config;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
 
 public class Events
@@ -30,8 +30,6 @@ public class Events
 	public static final Component EXTRA_NAUGHTY_LIST = Component.literal("EXTRA NAUGHTY LIST").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
 
 	private static final PriorityQueue<IntObjectImmutablePair<Runnable>> SCHEDULED_TASKS = new PriorityQueue<>(Comparator.comparing(IntObjectImmutablePair::leftInt));
-
-	private static int tickCounter = 0;
 
 	public static void register()
 	{
@@ -50,7 +48,24 @@ public class Events
 		switch ((int) overworld.getDayTime() % 24000)
 		{
 			case 13000 -> onNightfall(server);
-			case 18000 -> onMidnight(server, overworld);
+			case 18000 -> onMidnight(overworld);
+			case 18101 ->
+			{
+				ServerPlayer victim = null;
+				ServerPlayer hunter = null;
+				for (ServerPlayer player : server.getPlayerList().getPlayers())
+					switch (((ServerPlayerExtension) player).yolt$getRole())
+					{
+						case VICTIM -> victim = player;
+						case HUNTER -> hunter = player;
+					}
+				if (victim != null && hunter != null)
+				{
+					hunter.sendSystemMessage(Language.translatable("event.yolt.santa.grudge.3", victim.getDisplayName()).withStyle(ChatFormatting.GRAY));
+					hunter.sendSystemMessage(Language.translatable("event.yolt.santa.grudge.4", Events.EXTRA_NAUGHTY_LIST).withStyle(ChatFormatting.GRAY));
+					hunter.sendSystemMessage(Language.translatable("event.yolt.santa.grudge.5").withStyle(ChatFormatting.GRAY));
+				}
+			}
 		}
 	}
 
@@ -84,21 +99,22 @@ public class Events
 		}
 	}
 
-	private static void onMidnight(MinecraftServer server, ServerLevel overworld)
+	private static void onMidnight(ServerLevel overworld)
 	{
-		GameRules gameRules = overworld.getGameRules();
-
-		if (server.getPlayerList().getPlayers().stream().anyMatch(Player::isSleepingLongEnough) && ++tickCounter > Config.getSleepPercentageDecrementTicks())
-		{
-			gameRules.set(GameRules.PLAYERS_SLEEPING_PERCENTAGE, Math.max(gameRules.get(GameRules.PLAYERS_SLEEPING_PERCENTAGE) - 1, 0), server);
-			tickCounter = 0;
-		}
-
-		if (!gameRules.get(GameRules.ADVANCE_TIME))
-			return;
-
-		gameRules.set(GameRules.ADVANCE_TIME, false, server);
 		SoundHelper.broadcast(overworld, SoundHelper.YAWN, 1.0f, Mth.randomBetween(overworld.getRandom(), 0.9f, 1.1f));
+		overworld.setDayTime(18001);
+
+		List<ServerPlayer> players = overworld.getServer().getPlayerList().getPlayers();
+		ServerPlayer victim = players.stream().filter(player -> ((ServerPlayerExtension) player).yolt$getLives() > 1).findAny().orElse(null);
+		ServerPlayer hunter = players.stream().filter(player -> player != victim && ((ServerPlayerExtension) player).yolt$getRole() == Role.NEUTRAL).findAny().orElse(null);
+		if (victim != null && hunter != null)
+		{
+			((ServerPlayerExtension) victim).yolt$setRole(Role.VICTIM);
+			((ServerPlayerExtension) hunter).yolt$setRole(Role.HUNTER);
+
+			hunter.connection.send(new ClientboundSetTitleTextPacket(Language.translatable("event.yolt.santa.grudge.1").withStyle(ChatFormatting.AQUA)));
+			hunter.connection.send(new ClientboundSetSubtitleTextPacket(Language.translatable("event.yolt.santa.grudge.2")));
+		}
 	}
 
 	private static InteractionResult onPlayerUseItem(Player player, Level level, InteractionHand hand)
