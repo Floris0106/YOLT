@@ -8,6 +8,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
@@ -96,6 +97,15 @@ public abstract class ServerPlayerMixin implements ServerPlayerExtension
 			lightning.moveOrInterpolateTo(player.position());
 			lightning.setVisualOnly(true);
 			level.addFreshEntity(lightning);
+
+			List<ServerPlayer> livingPlayers = player.level().getServer().getPlayerList().getPlayers().stream().filter(p -> ((ServerPlayerExtension) p).yolt$getLives() >= 1).toList();
+			if (livingPlayers.size() == 1)
+			{
+				ServerPlayer winner = livingPlayers.getFirst();
+				PlayerList playerList = player.level().getServer().getPlayerList();
+				playerList.broadcastAll(new ClientboundSetTitleTextPacket(Language.translatable("event.yolt.deathmatch.end", winner.getDisplayName())));
+				winner.setGameMode(GameType.CREATIVE);
+			}
 		}
 
 		if (Config.doPlayersDropHeads())

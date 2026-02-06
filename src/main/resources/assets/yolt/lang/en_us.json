@@ -70,6 +70,7 @@
   "event.yolt.deathmatch.start.2": "His champion must be chosen within the next two hours...",
   "event.yolt.deathmatch.start.3": "or there will be %s...",
   "event.yolt.deathmatch.start.4": "Let the deathmatch begin!",
+  "event.yolt.deathmatch.end": "%s has won!",
   "event.yolt.gift": "Santa has sent you an early gift!",
   "enchantment.yolt.bountiful": "Bountiful",
   "tag.item.yolt.enchantable.key": "Keys",
