@@ -10,6 +10,7 @@
     "FrostedIceBlockMixin",
     "MobEffectsMixin",
     "PlayerMixin",
+    "SculkShriekerBlockEntityMixin",
     "ServerLevelMixin",
     "ServerPlayerMixin",
     "VaultBlockEntity$ServerMixin",

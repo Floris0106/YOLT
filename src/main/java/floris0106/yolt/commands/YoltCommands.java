@@ -26,6 +26,7 @@ public class YoltCommands
 							), false);
 						return 1;
 					})
+					.then(ThreatCommand.register())
 					.then(RoleCommand.register())
 					.then(RevealCommand.register())
 					.then(ResetCommand.register())
