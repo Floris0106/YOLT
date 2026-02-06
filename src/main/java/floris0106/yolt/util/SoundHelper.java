@@ -22,4 +22,9 @@ public class SoundHelper
 		for (ServerPlayer player : level.players())
 			player.connection.send(new ClientboundSoundEntityPacket(sound, SoundSource.VOICE, player, volume, pitch, seed));
 	}
+
+	public static void broadcast(ServerLevel level, SoundEvent sound, float volume, float pitch)
+	{
+		broadcast(level, Holder.direct(sound), volume, pitch);
+	}
 }

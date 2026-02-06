@@ -32,6 +32,7 @@ public class YoltCommands
 					.then(LivesCommand.register())
                     .then(HealthCommand.register())
 					.then(DebugCommand.register())
+					.then(DeathmatchCommand.register())
 					.then(ConfigCommand.register())
 					.then(ClaimCommand.register())
 			);

@@ -66,6 +66,10 @@
   "event.yolt.forgiven": "%s has been forgiven, and is no longer on the %s. Greens and yellows are no longer allowed to attack them.",
   "event.yolt.reveal": "%s is %s blocks to the %s",
   "event.yolt.reveal.other_dimension": "%s is in another dimension",
+  "event.yolt.deathmatch.start.1": "Santa has grown impatient!",
+  "event.yolt.deathmatch.start.2": "His champion must be chosen within the next two hours...",
+  "event.yolt.deathmatch.start.3": "or there will be %s...",
+  "event.yolt.deathmatch.start.4": "Let the deathmatch begin!",
   "enchantment.yolt.bountiful": "Bountiful",
   "tag.item.yolt.enchantable.key": "Keys",
   "soundCategory.voice": "YOLT Custom Sounds"

@@ -1,5 +1,7 @@
 package floris0106.yolt.util;
 
+import it.unimi.dsi.fastutil.ints.IntObjectImmutablePair;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -20,15 +22,26 @@ import net.minecraft.world.level.gamerules.GameRules;
 
 import floris0106.yolt.config.Config;
 
+import java.util.Comparator;
+import java.util.PriorityQueue;
+
 public class Events
 {
-	public static Component EXTRA_NAUGHTY_LIST = Component.literal("EXTRA NAUGHTY LIST").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
+	public static final Component EXTRA_NAUGHTY_LIST = Component.literal("EXTRA NAUGHTY LIST").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD);
+
+	private static final PriorityQueue<IntObjectImmutablePair<Runnable>> SCHEDULED_TASKS = new PriorityQueue<>(Comparator.comparing(IntObjectImmutablePair::leftInt));
 
 	private static int tickCounter = 0;
 
 	public static void register()
 	{
 		UseItemCallback.EVENT.register(Events::onPlayerUseItem);
+		ServerTickEvents.END_SERVER_TICK.register(Events::onEndTick);
+	}
+
+	public static void schedule(int tick, Runnable task)
+	{
+		SCHEDULED_TASKS.add(new IntObjectImmutablePair<>(tick, task));
 	}
 
 	public static void onTimeTick(ServerLevel overworld)
@@ -111,5 +124,18 @@ public class Events
 		serverPlayer.connection.send(new ClientboundSetActionBarTextPacket(component.append(" (" + Math.round(distance) + " blocks)")));
 
 		return InteractionResult.SUCCESS;
+	}
+
+	private static void onEndTick(MinecraftServer server)
+	{
+		while (true)
+		{
+			IntObjectImmutablePair<Runnable> pair = SCHEDULED_TASKS.peek();
+			if (pair == null || pair.leftInt() > server.getTickCount())
+				break;
+
+			pair.right().run();
+			SCHEDULED_TASKS.poll();
+		}
 	}
 }
