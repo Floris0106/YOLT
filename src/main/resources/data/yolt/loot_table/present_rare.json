@@ -8,51 +8,24 @@
           "type": "minecraft:item",
           "functions": [
             {
-              "function": "minecraft:enchant_with_levels",
-              "levels": {
-                "n": 30.0,
-                "p": 0.5,
-                "type": "minecraft:binomial"
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 4.0,
+                "min": 2.0
               },
-              "options": "#minecraft:on_random_loot"
+              "function": "minecraft:set_count"
             }
           ],
-          "name": "minecraft:iron_pickaxe",
+          "name": "minecraft:cobweb",
           "quality": -1,
           "weight": 2
         },
         {
           "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:enchant_with_levels",
-              "levels": {
-                "n": 30.0,
-                "p": 0.25,
-                "type": "minecraft:binomial"
-              },
-              "options": "#minecraft:on_random_loot"
-            }
-          ],
-          "name": "minecraft:iron_sword",
+          "name": "minecraft:lava_bucket",
           "quality": -1,
           "weight": 2
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:enchant_with_levels",
-              "levels": {
-                "n": 30.0,
-                "p": 0.5,
-                "type": "minecraft:binomial"
-              },
-              "options": "#minecraft:on_random_loot"
-            }
-          ],
-          "name": "minecraft:diamond_spear",
-          "weight": 3
         },
         {
           "type": "minecraft:item",
@@ -80,12 +53,6 @@
             }
           ],
           "name": "minecraft:diamond",
-          "quality": 1,
-          "weight": 2
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:netherite_scrap",
           "quality": 1,
           "weight": 2
         },

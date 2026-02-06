@@ -6,9 +6,14 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "name": "minecraft:netherite_sword",
+          "quality": 1
+        },
+        {
+          "type": "minecraft:item",
           "name": "minecraft:enchanted_golden_apple",
-          "quality": -2,
-          "weight": 4
+          "quality": -1,
+          "weight": 2
         },
         {
           "type": "minecraft:item",
@@ -47,21 +52,6 @@
           "type": "minecraft:loot_table",
           "quality": 1,
           "value": "yolt:spawn_egg"
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:dried_ghast",
-          "quality": -2,
-          "weight": 4
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:creaking_heart"
-        },
-        {
-          "type": "minecraft:item",
-          "name": "minecraft:netherite_upgrade_smithing_template",
-          "quality": 3
         },
         {
           "type": "minecraft:item",

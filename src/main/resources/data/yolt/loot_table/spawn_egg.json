@@ -7,50 +7,42 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:shulker_spawn_egg",
-          "quality": -1,
-          "weight": 2
+          "quality": -1
         },
         {
           "type": "minecraft:item",
           "name": "minecraft:breeze_spawn_egg",
-          "quality": -1,
-          "weight": 2
+          "quality": -1
         },
         {
           "type": "minecraft:item",
           "name": "minecraft:guardian_spawn_egg",
-          "quality": -1,
-          "weight": 2
+          "quality": -1
         },
         {
           "type": "minecraft:item",
           "name": "minecraft:blaze_spawn_egg",
-          "quality": -1,
-          "weight": 2
+          "quality": -1
         },
         {
           "type": "minecraft:item",
           "name": "minecraft:wither_skeleton_spawn_egg",
-          "quality": -1,
-          "weight": 2
+          "quality": -1
         },
         {
           "type": "minecraft:item",
           "name": "minecraft:vindicator_spawn_egg",
-          "quality": -1,
-          "weight": 2
+          "quality": -1
         },
         {
           "type": "minecraft:item",
           "name": "minecraft:hoglin_spawn_egg",
-          "quality": -1,
-          "weight": 2
+          "quality": -1
         },
         {
           "type": "minecraft:item",
           "name": "minecraft:zoglin_spawn_egg",
-          "quality": -1,
-          "weight": 2
+          "quality": -1
         },
         {
           "type": "minecraft:item",
