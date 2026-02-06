@@ -49,7 +49,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 public abstract class ServerLevelMixin implements ServerLevelExtension
 {
 	@Unique
-	private static final int YOLT$DAY_LENGTH_MULTIPLIER = 3;
+	private static final int YOLT$DAY_LENGTH_MULTIPLIER = 2;
 
 	@Unique
 	private int yolt$sleepingCutsceneCounter = 0;
