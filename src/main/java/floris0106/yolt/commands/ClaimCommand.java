@@ -12,6 +12,8 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.Objects;
 
@@ -39,7 +41,7 @@ public class ClaimCommand
 		PlayerList playerList = context.getSource().getServer().getPlayerList();
 		if (victimExtension.yolt$getRole() == Role.EXTRA_NAUGHTY)
 		{
-			hunterExtension.yolt$setLives(hunterExtension.yolt$getLives() + 1);
+			hunter.addItem(new ItemStack(Items.GOLDEN_APPLE));
 			victimExtension.yolt$setRole(Role.NEUTRAL);
 
 			playerList.broadcastSystemMessage(Language.translatable("commands.yolt.claim.extra_naughty.success", hunter.getDisplayName(), Component.literal("EXTRA NAUGHTY").withStyle(ChatFormatting.DARK_RED, ChatFormatting.BOLD), victim.getDisplayName()), false);
